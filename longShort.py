@@ -13,11 +13,19 @@ from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK
 import sys
 import json
 
+try:
+	if sys.argv[1] == "test":
+		test = True
+	else:
+		test = False
+except:
+	test = False
 
 with open("data.json") as f:
 	data = json.load(f)
 
-
+if test:
+	print("TEST RUN")
 
 def create_positions():
 
@@ -168,50 +176,51 @@ class IBapi(EWrapper, EClient):
 			elif RISK_TYPE == "percent":
 				qty = abs(int((self.accountValue * ACCOUNT_PERCENT) // (limit_price - stop_loss_price)))
 
-			print(limit_price, take_profit_price, stop_loss_price, qty)
-			
-			parentOrder = Order()
-			parentOrder.action = entrySide
-			parentOrder.orderType = "LMT"
-			parentOrder.totalQuantity = qty
-			parentOrder.lmtPrice = limit_price
-			parentOrder.transmit = False
-			#parentOrder.outsideRth = True
+			print(info["side"], info["symbol"], "Limit Price:", limit_price, "Take Profit Price:", take_profit_price, "Stop Loss Price:", stop_loss_price, "Quantity:", qty)
 
-	
-			
+			if not test:
+				parentOrder = Order()
+				parentOrder.action = entrySide
+				parentOrder.orderType = "LMT"
+				parentOrder.totalQuantity = qty
+				parentOrder.lmtPrice = limit_price
+				parentOrder.transmit = False
+				#parentOrder.outsideRth = True
 
-			
-			takeProfitOrder = Order()
-			takeProfitOrder.action = exitSide
-			takeProfitOrder.orderType = "LMT"
-			takeProfitOrder.totalQuantity = qty
-			takeProfitOrder.lmtPrice = take_profit_price
-			takeProfitOrder.parentId = self.nextOrderId
-			takeProfitOrder.transmit = False
-			#takeProfitOrder.outsideRth = True
+		
+				
 
-			
+				
+				takeProfitOrder = Order()
+				takeProfitOrder.action = exitSide
+				takeProfitOrder.orderType = "LMT"
+				takeProfitOrder.totalQuantity = qty
+				takeProfitOrder.lmtPrice = take_profit_price
+				takeProfitOrder.parentId = self.nextOrderId
+				takeProfitOrder.transmit = False
+				#takeProfitOrder.outsideRth = True
 
-			stopLossOrder = Order()
-			stopLossOrder.action = exitSide
-			stopLossOrder.orderType = "STP"
-			stopLossOrder.auxPrice = stop_loss_price
-			stopLossOrder.totalQuantity = qty
-			stopLossOrder.parentId = self.nextOrderId
-			stopLossOrder.transmit = True
-			#stopLossOrder.outsideRth = True
-			
-			
+				
 
-			self.placeOrder(self.nextOrderId, info["contract"], parentOrder)
-			self.nextOrderId += 1
-			self.placeOrder(self.nextOrderId, info["contract"], takeProfitOrder)
-			self.nextOrderId += 1
-			self.placeOrder(self.nextOrderId, info["contract"], stopLossOrder)
-			self.nextOrderId += 1
-			#print(limit_price, take_profit_price, stop_loss_price)
-			time.sleep(1)
+				stopLossOrder = Order()
+				stopLossOrder.action = exitSide
+				stopLossOrder.orderType = "STP"
+				stopLossOrder.auxPrice = stop_loss_price
+				stopLossOrder.totalQuantity = qty
+				stopLossOrder.parentId = self.nextOrderId
+				stopLossOrder.transmit = True
+				#stopLossOrder.outsideRth = True
+				
+				
+
+				self.placeOrder(self.nextOrderId, info["contract"], parentOrder)
+				self.nextOrderId += 1
+				self.placeOrder(self.nextOrderId, info["contract"], takeProfitOrder)
+				self.nextOrderId += 1
+				self.placeOrder(self.nextOrderId, info["contract"], stopLossOrder)
+				self.nextOrderId += 1
+				#print(limit_price, take_profit_price, stop_loss_price)
+				time.sleep(1)
 
 		#data["last_create_order"] = datetime.datetime.today().strftime("%m/%d/%Y, %H:%M:%S")
 		self.disconnect()
@@ -250,12 +259,12 @@ create_positions()
 
 thread.join()
 
-data["last_create_order"] = datetime.datetime.today().strftime("%m/%d/%Y, %H:%M:%S")
+if not test: 
+	data["last_create_order"] = datetime.datetime.today().strftime("%m/%d/%Y, %H:%M:%S")
 
-
-with open("data.json", "w") as f:
-	json.dump(data, f)
-print("Local position data updated")
+	with open("data.json", "w") as f:
+		json.dump(data, f)
+	print("Local position data updated")
 
 
 
