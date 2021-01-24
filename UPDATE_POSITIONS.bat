@@ -1,1 +1,2 @@
 python positionUpdate.py
+pause
