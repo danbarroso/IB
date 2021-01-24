@@ -233,7 +233,7 @@ def run_loop():
 
 
 app = IBapi()
-app.connect('127.0.0.1', 7497, 0)
+app.connect('127.0.0.1', 7496, 0)
 
 thread = threading.Thread(target=run_loop)
 
