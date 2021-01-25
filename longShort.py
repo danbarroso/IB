@@ -9,7 +9,7 @@ from ibapi.order_state import OrderState
 import time
 import threading
 import datetime
-from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE
+from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ATR_UP, ATR_DOWN
 import sys
 import json
 
@@ -128,10 +128,10 @@ class IBapi(EWrapper, EClient):
 		for reqId, info in self.newTickers.items():
 			if info['symbol'] in self.allCurrentTickers:
 				to_remove.append(reqId)
-		'''
+		
 		for reqId in to_remove:
 			self.newTickers.pop(reqId)
-		'''
+		
 		for reqId, info in self.newTickers.items():
 			contract = Contract()
 			contract.symbol = info["symbol"]
@@ -157,8 +157,8 @@ class IBapi(EWrapper, EClient):
 			if info["side"] == "long":
 				data["stage0"]["long"].append(info["symbol"])
 				limit_price = info["bars"][-1].high
-				take_profit_price = round(limit_price + (2 * atr), 2)
-				stop_loss_price = round(limit_price - (1.5 * atr), 2)
+				take_profit_price = round(limit_price + (ATR_UP * atr), 2)
+				stop_loss_price = round(limit_price - (ATR_DOWN * atr), 2)
 				entrySide = "BUY"
 				exitSide = "SELL"
 
@@ -166,8 +166,8 @@ class IBapi(EWrapper, EClient):
 			elif info["side"] == "short":
 				data["stage0"]["short"].append(info["symbol"])
 				limit_price = info["bars"][-1].low
-				take_profit_price = round(limit_price - (2 * atr), 2)
-				stop_loss_price = round(limit_price + (1.5 * atr), 2)
+				take_profit_price = round(limit_price - (ATR_UP * atr), 2)
+				stop_loss_price = round(limit_price + (ATR_DOWN * atr), 2)
 				entrySide = "SELL"
 				exitSide = "BUY"
 
