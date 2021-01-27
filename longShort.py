@@ -9,7 +9,7 @@ from ibapi.order_state import OrderState
 import time
 import threading
 import datetime
-from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ATR_UP, ATR_DOWN
+from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ATR_UP, ATR_DOWN, STOP_LIMIT_SPREAD
 import sys
 import json
 
@@ -131,7 +131,9 @@ class IBapi(EWrapper, EClient):
 		
 		for reqId in to_remove:
 			self.newTickers.pop(reqId)
-		
+		if self.newTickers == {}:
+			print("No new tickers")
+			app.disconnect()
 		for reqId, info in self.newTickers.items():
 			contract = Contract()
 			contract.symbol = info["symbol"]
@@ -157,6 +159,7 @@ class IBapi(EWrapper, EClient):
 			if info["side"] == "long":
 				data["stage0"]["long"].append(info["symbol"])
 				limit_price = info["bars"][-1].high
+				stop_limit_price = limit_price - STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price + (ATR_UP * atr), 2)
 				stop_loss_price = round(limit_price - (ATR_DOWN * atr), 2)
 				entrySide = "BUY"
@@ -166,6 +169,7 @@ class IBapi(EWrapper, EClient):
 			elif info["side"] == "short":
 				data["stage0"]["short"].append(info["symbol"])
 				limit_price = info["bars"][-1].low
+				stop_limit_price = limit_price + STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price - (ATR_UP * atr), 2)
 				stop_loss_price = round(limit_price + (ATR_DOWN * atr), 2)
 				entrySide = "SELL"
@@ -181,9 +185,10 @@ class IBapi(EWrapper, EClient):
 			if not test:
 				parentOrder = Order()
 				parentOrder.action = entrySide
-				parentOrder.orderType = "LMT"
+				parentOrder.orderType = "STP LMT"
 				parentOrder.totalQuantity = qty
 				parentOrder.lmtPrice = limit_price
+				parentOrder.auxPrice = stop_limit_price
 				parentOrder.transmit = False
 				#parentOrder.outsideRth = True
 
@@ -233,7 +238,7 @@ def run_loop():
 
 
 app = IBapi()
-app.connect('127.0.0.1', 7496, 0)
+app.connect('127.0.0.1', 7497, 0)
 
 thread = threading.Thread(target=run_loop)
 
