@@ -192,7 +192,8 @@ class IBapi(EWrapper, EClient):
 	def openOrder(self, orderId: int, contract: Contract, order: Order, orderState: OrderState):
 		#super().openOrder(orderId, contract, order, orderState)
 		#print("OpenOrder. PermId: ", order.permId, "ClientId:", order.clientId, " OrderId:", orderId, "Account:", order.account, "Symbol:", contract.symbol, "SecType:", contract.secType, "Exchange:", contract.exchange, "Action:", order.action, "OrderType:", order.orderType, "TotalQty:", order.totalQuantity, "CashQty:", order.cashQty, "LmtPrice:", order.lmtPrice, "AuxPrice:", order.auxPrice, "Status:", orderState.status)
-		self.positions[contract.symbol]["orders"] += orderId
+		if contract.symbol in self.positions.keys():
+			self.positions[contract.symbol]["orders"] += orderId
 
 	def orderStatus(self, orderId: int, status: str, filled: float, remaining: float, avgFillPrice: float, permId: int, parentId: int, lastFillPrice: float, clientId: int, whyHeld: str, mktCapPrice: float):
 		#super().orderStatus(orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice)
