@@ -158,8 +158,8 @@ class IBapi(EWrapper, EClient):
 
 			if info["side"] == "long":
 				data["stage0"]["long"].append(info["symbol"])
-				limit_price = info["bars"][-1].high
-				stop_limit_price = limit_price - STOP_LIMIT_SPREAD
+				stop_limit_price = info["bars"][-1].high
+				limit_price = stop_limit_price + STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price + (ATR_UP * atr), 2)
 				stop_loss_price = round(limit_price - (ATR_DOWN * atr), 2)
 				entrySide = "BUY"
@@ -168,8 +168,8 @@ class IBapi(EWrapper, EClient):
 
 			elif info["side"] == "short":
 				data["stage0"]["short"].append(info["symbol"])
-				limit_price = info["bars"][-1].low
-				stop_limit_price = limit_price + STOP_LIMIT_SPREAD
+				stop_limit_price = info["bars"][-1].low
+				limit_price = stop_limit_price - STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price - (ATR_UP * atr), 2)
 				stop_loss_price = round(limit_price + (ATR_DOWN * atr), 2)
 				entrySide = "SELL"
@@ -180,10 +180,11 @@ class IBapi(EWrapper, EClient):
 			elif RISK_TYPE == "percent":
 				qty = abs(int((self.accountValue * ACCOUNT_PERCENT) // (limit_price - stop_loss_price)))
 
-			print(info["side"], info["symbol"], "Limit Price:", limit_price, "Take Profit Price:", take_profit_price, "Stop Loss Price:", stop_loss_price, "Quantity:", qty)
+			print(info["side"], info["symbol"], "Limit Price:", limit_price,"Stop Price": stop_limit_price, "Take Profit Price:", take_profit_price, "Stop Loss Price:", stop_loss_price, "Quantity:", qty)
 
 			if not test:
 				parentOrder = Order()
+				parentOrder.tif = "GTC"
 				parentOrder.action = entrySide
 				parentOrder.orderType = "STP LMT"
 				parentOrder.totalQuantity = qty
@@ -197,6 +198,7 @@ class IBapi(EWrapper, EClient):
 
 				
 				takeProfitOrder = Order()
+				takeProfitOrder.tif = "GTC"
 				takeProfitOrder.action = exitSide
 				takeProfitOrder.orderType = "LMT"
 				takeProfitOrder.totalQuantity = qty
@@ -208,6 +210,7 @@ class IBapi(EWrapper, EClient):
 				
 
 				stopLossOrder = Order()
+				stopLossOrder.tif= "GTC"
 				stopLossOrder.action = exitSide
 				stopLossOrder.orderType = "STP"
 				stopLossOrder.auxPrice = stop_loss_price

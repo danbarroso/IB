@@ -9,7 +9,7 @@ from ibapi.order_state import OrderState
 import time
 import threading
 import datetime
-from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ACCOUNT_STRING
+from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ACCOUNT_STRING, PROFIT_LEVEL
 import sys
 import json
 
@@ -175,7 +175,7 @@ class IBapi(EWrapper, EClient):
 		info = self.positions[symbol]
 		basis = info["size"] * info["avgCost"]
 		perChange = (value - basis) / basis
-		if perChange >= 0.02:
+		if perChange >= PROFIT_LEVEL:
 			if symbol in data["stage1"]["short"]:
 				data["stage1"]["short"].remove(symbol)
 				data["stage2"]["short"].append(symbol)
