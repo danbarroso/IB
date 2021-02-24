@@ -180,7 +180,7 @@ class IBapi(EWrapper, EClient):
 			elif RISK_TYPE == "percent":
 				qty = abs(int((self.accountValue * ACCOUNT_PERCENT) // (limit_price - stop_loss_price)))
 
-			print(info["side"], info["symbol"], "Limit Price:", limit_price,"Stop Price": stop_limit_price, "Take Profit Price:", take_profit_price, "Stop Loss Price:", stop_loss_price, "Quantity:", qty)
+			print(info["side"], info["symbol"], "Limit Price:", limit_price,"Stop Price", stop_limit_price, "Take Profit Price:", take_profit_price, "Stop Loss Price:", stop_loss_price, "Quantity:", qty)
 
 			if not test:
 				parentOrder = Order()
@@ -241,7 +241,7 @@ def run_loop():
 
 
 app = IBapi()
-app.connect('127.0.0.1', 7496, 0)
+app.connect('127.0.0.1', 7497, 0)
 
 thread = threading.Thread(target=run_loop)
 
