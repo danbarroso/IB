@@ -35,6 +35,7 @@ def create_positions():
 		reqId += 1
 	for sym in SHORT_TICKERS:
 		app.newTickers[reqId] = {"symbol":sym, "side":"short"}
+		reqId += 1
 	print("Retrieving necessary data...")
 	app.reqPositions()
 	app.reqAllOpenOrders()
@@ -79,6 +80,7 @@ class IBapi(EWrapper, EClient):
 		
 		
 	def position(self, account: str, contract: Contract, position: float, avgCost: float):
+
 		self.allCurrentTickers.add(contract.symbol)
 
 	def positionEnd(self):
@@ -108,6 +110,7 @@ class IBapi(EWrapper, EClient):
 	def contractDetails(self, reqId : int, contractDetails : ContractDetails):
 		self.newTickers[reqId]["contract"] = contractDetails.contract
 		self.recievedContracts += 1
+		print(contractDetails.contract.symbol)
 		if self.recievedContracts == len(self.newTickers):
 			self.getPriceData()
 
@@ -127,6 +130,7 @@ class IBapi(EWrapper, EClient):
 		to_remove = []
 		for reqId, info in self.newTickers.items():
 			if info['symbol'] in self.allCurrentTickers:
+				print(info["symbol"])
 				to_remove.append(reqId)
 		
 		for reqId in to_remove:
