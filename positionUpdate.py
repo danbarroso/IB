@@ -127,12 +127,6 @@ class IBapi(EWrapper, EClient):
 		time.sleep(5)
 		self.disconnect()
 
-now = datetime.datetime.today()
-if (now.hour > 9 and now.hour < 17) or (now.hour == 9 and now.minute >= 30):
-	MARKET_OPEN = True
-else:
-	MARKET_OPEN = False
-
 
 def run_loop():
 	app.run()
@@ -140,7 +134,7 @@ def run_loop():
 print("Configuring Connection...")
 
 app = IBapi()
-app.connect('127.0.0.1', 7497, 104)
+app.connect('127.0.0.1', 7496, 104)
 
 time.sleep(5)
 
