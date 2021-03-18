@@ -100,7 +100,7 @@ class IBapi(EWrapper, EClient):
 			while True:
 				res = input("Please type (Enter/Y/N/customprice): ")
 				try:
-					res_num = float(res.strip)
+					res_num = float(res.strip())
 				except:
 					res_num = None
 
