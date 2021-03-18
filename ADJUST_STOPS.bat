@@ -1,0 +1,2 @@
+python adjustStops.py
+pause
