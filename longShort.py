@@ -21,8 +21,6 @@ try:
 except:
 	test = False
 
-with open("data.json") as f:
-	data = json.load(f)
 
 if test:
 	print("TEST RUN")
@@ -161,7 +159,6 @@ class IBapi(EWrapper, EClient):
 			atr = total / len(info["bars"])
 
 			if info["side"] == "long":
-				data["stage0"]["long"].append(info["symbol"])
 				stop_limit_price = info["bars"][-1].high
 				limit_price = stop_limit_price + STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price + (ATR_UP * atr), 2)
@@ -171,7 +168,6 @@ class IBapi(EWrapper, EClient):
 
 
 			elif info["side"] == "short":
-				data["stage0"]["short"].append(info["symbol"])
 				stop_limit_price = info["bars"][-1].low
 				limit_price = stop_limit_price - STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price - (ATR_UP * atr), 2)
@@ -231,10 +227,9 @@ class IBapi(EWrapper, EClient):
 				self.nextOrderId += 1
 				self.placeOrder(self.nextOrderId, info["contract"], stopLossOrder)
 				self.nextOrderId += 1
-				#print(limit_price, take_profit_price, stop_loss_price)
+				
 				time.sleep(1)
 
-		#data["last_create_order"] = datetime.datetime.today().strftime("%m/%d/%Y, %H:%M:%S")
 		self.disconnect()
 
 
@@ -245,23 +240,9 @@ def run_loop():
 
 
 app = IBapi()
-app.connect('127.0.0.1', 7496, 0)
+app.connect('127.0.0.1', 7497, 123)
 
 thread = threading.Thread(target=run_loop)
-
-
-now = datetime.datetime.today()
-
-
-last_time = datetime.datetime.strptime(data["last_create_order"], "%m/%d/%Y, %H:%M:%S")
-if last_time.day == now.day and last_time.month == now.month:
-	inputStr = "You already placed new orders today at " + str(last_time.time()) + ", would you like to continue? (Enter Yes/No)"
-	res = input(inputStr)
-	if res != "Yes":
-		print("Exiting program...")
-		app.disconnect()
-		time.sleep(2)
-		sys.exit(0)
 
 
 thread.start()
@@ -271,12 +252,6 @@ create_positions()
 
 thread.join()
 
-if not test: 
-	data["last_create_order"] = datetime.datetime.today().strftime("%m/%d/%Y, %H:%M:%S")
-
-	with open("data.json", "w") as f:
-		json.dump(data, f)
-	print("Local position data updated")
 
 
 

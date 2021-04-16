@@ -12,8 +12,6 @@ import datetime
 from input import LONG_TICKERS, SHORT_TICKERS, TRADE_RISK, ACCOUNT_PERCENT, RISK_TYPE, ACCOUNT_STRING, IGNORE
 import sys
 
-
-
 class IBapi(EWrapper, EClient):
 	def __init__(self):
 		EClient.__init__(self, self)
@@ -21,25 +19,24 @@ class IBapi(EWrapper, EClient):
 		self.positions = {}
 		self.currentDataReqId = 0
 		self.dataReqIds = {}
-
-
+	
 	def position(self, account: str, contract: Contract, position: float, avgCost: float):
 
 		if position != 0 and contract.symbol not in IGNORE:
 			self.positions[contract.symbol] = {"position":position}
 
 	def positionEnd(self):
-
 		print("Current Positions Recieved...")
 		self.reqAllOpenOrders()
 
 	def openOrder(self, orderId: int, contract: Contract, order: Order, orderState: OrderState):
-
+		print(orderId)
 		this_symbol = contract.symbol
 		if order.orderType == "STP" and this_symbol in self.positions.keys():
 		
 			self.positions[this_symbol]["contract"] = contract
 			self.positions[this_symbol]["order"] = order
+			print(orderId)
 			self.positions[this_symbol]["orderId"] = orderId
 
 	def openOrderEnd(self):
@@ -53,6 +50,10 @@ class IBapi(EWrapper, EClient):
 
 		for symbol in to_remove:
 			self.positions.pop(symbol)
+		if len(self.positions) == 0:
+			print("No stops to update, exiting program...")
+			self.disconnect()
+		print("Open Stops:", list(self.positions.keys()))
 
 		print("Open Orders Recieved, Checking Price Data...")
 		for symbol, info in self.positions.items():
@@ -83,7 +84,7 @@ class IBapi(EWrapper, EClient):
 
 	def beginUpdate(self):
 
-		print("The program will now loop through your positions with stops and suggest new prices...")
+		print("\n\nThe program will now loop through your positions with stops and suggest new prices...")
 		print("-To take no action/skip a certain position, just hit enter or type N and then hit enter...")
 		print("-To adjust the stop to the suggested price type Y and hit enter...")
 		print("-To adjust the stop to a custom price just type in that price and hit enter...")
@@ -127,14 +128,13 @@ class IBapi(EWrapper, EClient):
 		time.sleep(5)
 		self.disconnect()
 
-
 def run_loop():
 	app.run()
 
 print("Configuring Connection...")
 
 app = IBapi()
-app.connect('127.0.0.1', 7496, 104)
+app.connect('127.0.0.1', 7497, 123)
 
 time.sleep(5)
 
@@ -144,8 +144,6 @@ thread.start()
 time.sleep(5)
 
 app.reqPositions()
-
-
 
 
 
