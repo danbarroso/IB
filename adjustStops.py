@@ -134,7 +134,7 @@ def run_loop():
 print("Configuring Connection...")
 
 app = IBapi()
-app.connect('127.0.0.1', 7497, 123)
+app.connect('127.0.0.1', 7496, 123)
 
 time.sleep(5)
 
