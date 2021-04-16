@@ -79,7 +79,8 @@ class IBapi(EWrapper, EClient):
 		
 	def position(self, account: str, contract: Contract, position: float, avgCost: float):
 
-		self.allCurrentTickers.add(contract.symbol)
+		if position != 0:
+			self.allCurrentTickers.add(contract.symbol)
 
 	def positionEnd(self):
 		self.recievedPositions = True
