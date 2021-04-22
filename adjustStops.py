@@ -30,13 +30,12 @@ class IBapi(EWrapper, EClient):
 		self.reqAllOpenOrders()
 
 	def openOrder(self, orderId: int, contract: Contract, order: Order, orderState: OrderState):
-		print(orderId)
+		
 		this_symbol = contract.symbol
 		if order.orderType == "STP" and this_symbol in self.positions.keys():
 		
 			self.positions[this_symbol]["contract"] = contract
 			self.positions[this_symbol]["order"] = order
-			print(orderId)
 			self.positions[this_symbol]["orderId"] = orderId
 
 	def openOrderEnd(self):
