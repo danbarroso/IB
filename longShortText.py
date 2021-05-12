@@ -185,7 +185,7 @@ class IBapi(EWrapper, EClient):
 					qty = 1
 
 				f.write("{side} {symbol} Limit Price: {limit_price}, Stop Limit Price: {stop_limit_price}, Take Profit Price: {take_profit_price}, Stop Loss Price {stop_loss_price}, Quantity: {qty}\n".format(side=info["side"], symbol=info["symbol"], limit_price=limit_price, stop_limit_price=stop_limit_price, take_profit_price=take_profit_price, stop_loss_price=stop_loss_price, qty=qty))
-				
+			f.close()
 
 		self.disconnect()
 
