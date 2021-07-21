@@ -160,7 +160,7 @@ class IBapi(EWrapper, EClient):
 			atr = total / len(info["bars"])
 
 			if info["side"] == "long":
-				stop_limit_price = 59.60 #info["bars"][-1].high
+				stop_limit_price = info["bars"][-1].high
 				limit_price = stop_limit_price + STOP_LIMIT_SPREAD
 				take_profit_price = round(limit_price + (ATR_UP * atr), 2)
 				stop_loss_price = round(limit_price - (ATR_DOWN * atr), 2)
